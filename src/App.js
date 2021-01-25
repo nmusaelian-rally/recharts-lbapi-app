@@ -1,6 +1,7 @@
 
 import React, { Component } from 'react';
 import LineRechart from './components/LineRechart';
+import axios from 'axios';
 
 /*
 https://rally1.rallydev.com/analytics/v2.0/service/rally/workspace/41529001/artifact/snapshot/query.js?find={"Project":332322441800,"_TypeHierarchy":"HierarchicalRequirement","ScheduleState"
@@ -29,27 +30,37 @@ console.log(`url: ${url}`)
 
 class App extends Component {
   state = {
-    items: []
-  }
-
-  getItems(){
-    fetch(url, {
-      headers: {
-        'zsessionid': apiKey, 
-        'Content-Type': 'application/json'
-      }
-    })
-      .then(response => response.json())
-      .then(json => this.setState({items: json['Results']}))
-      .catch(err => console.log(err))
-  }
-
-  componentDidMount(){
-    this.getItems()
-  }
+    items: [],
+    isLoading: false
+  } 
   
+  async componentDidMount(){
+    this.setState({ isLoading: true });
+    try {
+      const result = await axios.get(url, {
+        headers: {
+          'zsessionid': apiKey, 
+          'Content-Type': 'application/json'
+        }
+      });
+ 
+      this.setState({
+        items: result.data['Results'],
+        isLoading: false
+      });
+    } catch (error) {
+        console.log(error);
+        this.setState({
+          isLoading: false
+        });
+    }
+  }
 
   render() {
+ 
+    if (this.state.isLoading) {
+      return <div>Loading.. please wait!</div>
+    }
     return (
       <div className="App">
         <h2>Title goes here</h2>
