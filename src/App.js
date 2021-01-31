@@ -13,7 +13,8 @@ const project = 332322441800;
 const type = 'HierarchicalRequirement';
 const gte = '2020-01-01';
 const lt =  '2021-01-01';
-const find = {
+
+const findInProgress = {
   Project: project,
   _TypeHierarchy:type,
   ScheduleState:"In-Progress",
@@ -21,31 +22,55 @@ const find = {
   _ValidFrom: {"$gte":gte,"$lt":lt}
 }
 
-const API = `https://rally1.rallydev.com/analytics/v2.0/service/rally/workspace/${workspace}/artifact/snapshot/query.js?find=`;
-const QUERY = `${JSON.stringify(find)}`;
-const url = `${API}${QUERY}`
-const apiKey = process.env.REACT_APP_APIKEY;
+const findReleased = {
+  Project: project,
+  _TypeHierarchy:type,
+  ScheduleState:"Released",
+  "_PreviousValues.ScheduleState":"Accepted",
+  _ValidFrom: {"$gte":gte,"$lt":lt}
+}
 
-console.log(`url: ${url}`)
+const fields = [
+  '"ObjectID"',
+  '"_ValidFrom"',
+  '"_ValidTo"',
+  '"ScheduleState"',
+  '"_PreviousValues.ScheduleState"'
+];
+
+const hydrate = ['"ScheduleState"','"_PreviousValues.ScheduleState"'];
+
+const api = `https://rally1.rallydev.com/analytics/v2.0/service/rally/workspace/${workspace}/artifact/snapshot/query.js?find=`;
+const queryInProgress = `${JSON.stringify(findInProgress)}`;
+const queryReleased = `${JSON.stringify(findReleased)}`;
+const url1 = `${api}${queryInProgress}&fields=[${fields}]&hydrate=[${hydrate}]`;
+const url2 = `${api}${queryReleased}&fields=[${fields}]&hydrate=[${hydrate}]`;
+
+console.log(`url1: ${url1}`);
+const apiKey = process.env.REACT_APP_APIKEY;
 
 class App extends Component {
   state = {
-    items: [],
+    inProgress: [],
+    released: [],
     isLoading: false
   } 
   
   async componentDidMount(){
     this.setState({ isLoading: true });
+    const headers = {
+      'zsessionid': apiKey, 
+      'Content-Type': 'application/json'
+    }
     try {
-      const result = await axios.get(url, {
-        headers: {
-          'zsessionid': apiKey, 
-          'Content-Type': 'application/json'
-        }
-      });
+      const result = await axios.all([
+        axios.get(url1, {headers: headers}),
+        axios.get(url2, {headers: headers})
+      ]);
  
       this.setState({
-        items: result.data['Results'],
+        inProgress: result[0].data['Results'],
+        released:   result[1].data['Results'],
         isLoading: false
       });
     } catch (error) {
@@ -64,7 +89,7 @@ class App extends Component {
     return (
       <div className="App">
         <h2>Title goes here</h2>
-        <LineRechart items={this.state.items}/>
+        <LineRechart items={[this.state.inProgress, this.state.released]}/>
       </div>
     );
   }
