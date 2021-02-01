@@ -46,7 +46,6 @@ const queryReleased = `${JSON.stringify(findReleased)}`;
 const url1 = `${api}${queryInProgress}&fields=[${fields}]&hydrate=[${hydrate}]`;
 const url2 = `${api}${queryReleased}&fields=[${fields}]&hydrate=[${hydrate}]`;
 
-console.log(`url1: ${url1}`);
 const apiKey = process.env.REACT_APP_APIKEY;
 
 class App extends Component {
@@ -88,8 +87,10 @@ class App extends Component {
     }
     return (
       <div className="App">
-        <h2>Title goes here</h2>
+        <div className="container">
+        <h3>Story count per month by state transition</h3>
         <LineRechart items={[this.state.inProgress, this.state.released]}/>
+        </div>
       </div>
     );
   }

@@ -6,15 +6,12 @@ class LineRechart extends Component {
     countStories(item){
         const dt = new Date(item['_ValidFrom']);
         const scheduleState = item['ScheduleState'];
-        console.log(`scheduleState: ${scheduleState}`);
         const month = dt.toLocaleString('default', {month: 'long'});
-        console.log(`MONTH: ${month}`);
-        !(this.stats[month]) && (this.stats[month] = {});
+        this.stats[month] = this.stats[month] || {} ;
         this.stats[month][scheduleState] = (this.stats[month][scheduleState] || 0) + 1;
     }
 
     bucketData(){
-        console.log(`stats: ${JSON.stringify(this.stats)}`);
         const data = []
         for (let k in this.stats){
             data.push({"month": k, "In-Progress": this.stats[k]["In-Progress"], "Released": this.stats[k]["Released"]})
@@ -34,8 +31,8 @@ class LineRechart extends Component {
                     <YAxis />
                     <Tooltip />
                     <Legend />
-                    <Line type="monotone" dataKey="In-Progress" stroke="#0095FF" />
-                    <Line type="monotone" dataKey="Released" stroke="#FF0000" />
+                    <Line name="moved to In-Progress" type="monotone" dataKey="In-Progress" stroke="#0095FF" />
+                    <Line name="moved to Released" type="monotone" dataKey="Released" stroke="#FF0000" />
                 </LineChart>
             </div>
         )
