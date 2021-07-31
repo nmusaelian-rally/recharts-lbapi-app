@@ -30,7 +30,7 @@ class LineRechart extends Component {
                     <XAxis dataKey="month" interval={0}/>
                     <YAxis />
                     <Tooltip />
-                    <Legend />
+                    <Legend wrapperStyle={{position: 'relative', marginTop: '20px'}}/>
                     <Line name="moved to In-Progress" type="monotone" dataKey="In-Progress" stroke="#0095FF" />
                     <Line name="moved to Released" type="monotone" dataKey="Released" stroke="#FF0000" />
                 </LineChart>
