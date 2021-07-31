@@ -5,23 +5,25 @@ class LineRechart extends Component {
     stats = {};
     countStories(item){
         const dt = new Date(item['_ValidFrom']);
-        const month = dt.toLocaleString('default', { month: 'long' });
-        this.stats[month] = (this.stats[month] || 0) + 1;
+        const scheduleState = item['ScheduleState'];
+        const month = dt.toLocaleString('default', {month: 'long'});
+        this.stats[month] = this.stats[month] || {} ;
+        this.stats[month][scheduleState] = (this.stats[month][scheduleState] || 0) + 1;
     }
 
     bucketData(){
         const data = []
         for (let k in this.stats){
-            data.push({"month": k, "In-Progress": this.stats[k]})
+            data.push({"month": k, "In-Progress": this.stats[k]["In-Progress"], "Released": this.stats[k]["Released"]})
         }
-        //console.log(data)
         return data;
     }
 
     render() {
         return (
             <div>
-                {this.props.items.map(item => this.countStories(item))}
+                {this.props.items[0].map(item => this.countStories(item))}
+                {this.props.items[1].map(item => this.countStories(item))}
                 <LineChart width={1000} height={250} data={this.bucketData()}
                     margin={{ top: 5, right: 40, left: 40, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="4 4" />
@@ -29,7 +31,8 @@ class LineRechart extends Component {
                     <YAxis />
                     <Tooltip />
                     <Legend />
-                    <Line type="monotone" dataKey="In-Progress" stroke="#0095FF" />
+                    <Line name="moved to In-Progress" type="monotone" dataKey="In-Progress" stroke="#0095FF" />
+                    <Line name="moved to Released" type="monotone" dataKey="Released" stroke="#FF0000" />
                 </LineChart>
             </div>
         )
