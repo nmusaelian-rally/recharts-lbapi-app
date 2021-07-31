@@ -22,8 +22,8 @@ class LineRechart extends Component {
     render() {
         return (
             <div>
-                {this.props.items[0].map(item => this.countStories(item))}
-                {this.props.items[1].map(item => this.countStories(item))}
+                {this.props.items && this.props.items[0] && this.props.items[0].map(item => this.countStories(item))}
+                {this.props.items && this.props.items[1] && this.props.items[1].map(item => this.countStories(item))}
                 <LineChart width={1000} height={250} data={this.bucketData()}
                     margin={{ top: 5, right: 40, left: 40, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="4 4" />

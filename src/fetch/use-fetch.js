@@ -1,32 +1,40 @@
-import { useState, useEffect, } from 'react';
+//import { useState, useEffect, } from 'react';
+import { useState, useCallback } from 'react';
 import axios from 'axios';
 
-const useFetch = (url1, url2, headers, initState) => {
-  const [data, setData] = useState(initState);
+const useFetch = () => {
+  //const [data, setData] = useState(initState);
   const [loading, setLoading] = useState(false);
-  useEffect(()=>{
-    const fetchData = async () => {
-      try{
-        setLoading(true);
-        const result = await axios.all([
-          axios.get(url1, {headers: headers}),
-          axios.get(url2, {headers: headers})
-        ]);
-        console.log(result);
-        setData({
-          inProgress: result[0].data['Results'],
-          released:   result[1].data['Results']
-        });
-      } catch(error){
-        throw(error);
-      } finally {
-        setLoading(false);
+  const [error, setError] = useState(null);
+
+  const makeRequest = useCallback(async (requestCfg, packageData) => {
+      setLoading(true);
+      setError(null);
+      const [url1, url2] = requestCfg.urls;
+      const options = {
+        method: requestCfg.method ? requestCfg.method : 'GET',
+        headers: requestCfg.headers ? requestCfg.headers : {},
+        body: requestCfg.body ? JSON.stringify(requestCfg.body) : null
       }
+      try{
+        const result = await axios.all([
+            axios.get(url1, options),
+            axios.get(url2, options)
+          ]);
+        packageData({
+            inProgress: result[0].data['Results'],
+            released:   result[1].data['Results']
+        });
+      }catch (err) {
+        setError(err.message || 'Something went wrong!');
     }
-    fetchData();
-    },[url1, url2] //adding headers creates infinite loading
-  )  
-  return { loading, data }
+    setLoading(false)
+  }, [])
+  return {
+      loading,
+      error,
+      makeRequest
+  }
 }
 
 export default useFetch;
