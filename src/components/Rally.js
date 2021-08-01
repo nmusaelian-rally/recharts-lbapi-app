@@ -10,15 +10,15 @@ const Rally = () => {
         const workspace = 41529001;
         const project = 332322441800;
         const type = 'HierarchicalRequirement';
-        const gte = '2020-01-01';
-        const lt =  '2021-01-01';
+        const gte = '2021-01-01';
+        const lte =  new Date().toISOString().replace(/T.*/,'').split('-').join('-');
       
         const findInProgress = {
           Project: project,
           _TypeHierarchy:type,
           ScheduleState:"In-Progress",
           "_PreviousValues.ScheduleState":"Defined",
-          _ValidFrom: {"$gte":gte,"$lt":lt}
+          _ValidFrom: {"$gte":gte,"$lte":lte}
         }
       
         const findReleased = {
@@ -26,7 +26,7 @@ const Rally = () => {
           _TypeHierarchy:type,
           ScheduleState:"Released",
           "_PreviousValues.ScheduleState":"Accepted",
-          _ValidFrom: {"$gte":gte,"$lt":lt}
+          _ValidFrom: {"$gte":gte,"$lte":lte}
         }
       
         const fields = [
@@ -65,9 +65,9 @@ const Rally = () => {
         <div className="App">
           <div className="container">
             {loading && <div className="loader">Loading...</div>}
-            {error && <div className="error">OH, NOES!!!</div>}
+            {error && <div className="error">OH, NOES!!! { error } </div>}
             <h3>Story count per month by state transition</h3>
-            <LineRechart items={rallyData}/>
+            {!error && <LineRechart items={rallyData}/>}
           </div>
         </div>
       );
