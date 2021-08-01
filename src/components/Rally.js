@@ -3,9 +3,10 @@ import LineRechart from "./LineRechart";
 import { useState, useEffect } from "react";
 
 
-const Rally = () => {
+const Rally = ({selected}) => {
     const [rallyData, setRallyData] = useState([]);
     const {loading, error, makeRequest: makeLookbackApiRequest} = useFetch();
+    console.log('reloaded Rally', selected);
     useEffect(()=>{
         const workspace = 41529001;
         const project = 332322441800;

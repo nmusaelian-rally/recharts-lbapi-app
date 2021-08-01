@@ -9,25 +9,22 @@ const useFetch = () => {
   const makeRequest = useCallback(async (requestCfg, packageData) => {
       setLoading(true);
       setError(null);
-      //const [url1, url2] = requestCfg.urls;
       const options = {
         method: requestCfg.method ? requestCfg.method : 'GET',
         headers: requestCfg.headers ? requestCfg.headers : {},
         body: requestCfg.body ? JSON.stringify(requestCfg.body) : null
       }
-      const axiosAll = [];
+      const requests = [];
       for(const url of requestCfg.urls){
-          let newPromise = axios({
-              url: url,
-              method: options.method,
-              headers: options.headers,
-              body: options.body,
-          })
-          axiosAll.push(newPromise)
-      }
-      console.log(axiosAll)
+        requests.push(axios({
+            url: url,
+            method: options.method,
+            headers: options.headers,
+            body: options.body
+        })
+      )}
       try{
-        const result = await axios.all(axiosAll);
+        const result = await axios.all(requests);
         packageData({
             inProgress: result[0].data['Results'],
             released:   result[1].data['Results']
